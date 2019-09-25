@@ -69,9 +69,9 @@ public class SimpleStatementHandler extends BaseStatementHandler {
 
   @Override
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
-    String sql = boundSql.getSql();
-    statement.execute(sql);
-    return resultSetHandler.<E>handleResultSets(statement);
+    String sql = boundSql.getSql();//获取sql语句
+    statement.execute(sql);//执行sql语句
+    return resultSetHandler.<E>handleResultSets(statement);//使用resultSetHandler处理查询结果
   }
 
   @Override
@@ -82,8 +82,10 @@ public class SimpleStatementHandler extends BaseStatementHandler {
   }
 
   @Override
+  //使用底层的statment对象来完成对数据库的操作
   protected Statement instantiateStatement(Connection connection) throws SQLException {
     if (mappedStatement.getResultSetType() != null) {
+    	//设置结果集是否可以滚动以及其游标是否可以上下移动，设置结果集是否可更新
       return connection.createStatement(mappedStatement.getResultSetType().getValue(), ResultSet.CONCUR_READ_ONLY);
     } else {
       return connection.createStatement();

@@ -391,19 +391,21 @@ public class XMLConfigBuilder extends BaseBuilder {
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
           String mapperClass = child.getStringAttribute("class");
-          if (resource != null && url == null && mapperClass == null) {
+          if (resource != null && url == null && mapperClass == null) {//如果resource不为空
             ErrorContext.instance().resource(resource);
-            InputStream inputStream = Resources.getResourceAsStream(resource);
+            InputStream inputStream = Resources.getResourceAsStream(resource);//加载mapper文件
+            //实例化XMLMapperBuilder解析mapper映射文件
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
             mapperParser.parse();
-          } else if (resource == null && url != null && mapperClass == null) {
+          } else if (resource == null && url != null && mapperClass == null) {//如果url不为空
             ErrorContext.instance().resource(url);
-            InputStream inputStream = Resources.getUrlAsStream(url);
+            InputStream inputStream = Resources.getUrlAsStream(url);//加载mapper文件
+            //实例化XMLMapperBuilder解析mapper映射文件
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
             mapperParser.parse();
-          } else if (resource == null && url == null && mapperClass != null) {
-            Class<?> mapperInterface = Resources.classForName(mapperClass);
-            configuration.addMapper(mapperInterface);
+          } else if (resource == null && url == null && mapperClass != null) {//如果class不为空
+            Class<?> mapperInterface = Resources.classForName(mapperClass);//加载class对象
+            configuration.addMapper(mapperInterface);//向代理中心注册mapper
           } else {
             throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
           }

@@ -39,6 +39,7 @@ public class XMLLanguageDriver implements LanguageDriver {
   }
 
   @Override
+  //解析xml文件中的sql语句并封装成SqlSource
   public SqlSource createSqlSource(Configuration configuration, XNode script, Class<?> parameterType) {
     XMLScriptBuilder builder = new XMLScriptBuilder(configuration, script, parameterType);
     return builder.parseScriptNode();

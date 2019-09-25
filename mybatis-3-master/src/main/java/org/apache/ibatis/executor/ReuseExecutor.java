@@ -54,9 +54,12 @@ public class ReuseExecutor extends BaseExecutor {
 
   @Override
   public <E> List<E> doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
-    Configuration configuration = ms.getConfiguration();
+    Configuration configuration = ms.getConfiguration();//获取configuration对象
+    //创建StatementHandler对象
     StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
+  //StatementHandler对象创建stmt,并使用parameterHandler对占位符进行处理
     Statement stmt = prepareStatement(handler, ms.getStatementLog());
+  //通过statementHandler对象调用ResultSetHandler将结果集转化为指定对象返回
     return handler.<E>query(stmt, resultHandler);
   }
 
@@ -80,15 +83,16 @@ public class ReuseExecutor extends BaseExecutor {
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     BoundSql boundSql = handler.getBoundSql();
-    String sql = boundSql.getSql();
-    if (hasStatementFor(sql)) {
-      stmt = getStatement(sql);
-      applyTransactionTimeout(stmt);
-    } else {
+    String sql = boundSql.getSql();//获取sql语句
+    if (hasStatementFor(sql)) {//根据sql语句检查是否缓存了对应的Statement
+      stmt = getStatement(sql);//获取缓存的Statement
+      applyTransactionTimeout(stmt);//设置新的超时时间
+    } else {//缓存中没有statment，创建statment过程和SimpleExecutor类似
       Connection connection = getConnection(statementLog);
       stmt = handler.prepare(connection, transaction.getTimeout());
-      putStatement(sql, stmt);
+      putStatement(sql, stmt);//放入缓存中
     }
+  //使用parameterHandler处理占位符
     handler.parameterize(stmt);
     return stmt;
   }

@@ -267,11 +267,11 @@ public class Reflector {
           // pr #16 - final static can only be set by the classloader
           int modifiers = field.getModifiers();
           if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
-            addSetField(field);
+            addSetField(field);//这里给没有个set方法的属性，生成一个set方法
           }
         }
         if (!getMethods.containsKey(field.getName())) {
-          addGetField(field);
+          addGetField(field);//这里给没有个get方法的属性，生成一个get方法
         }
       }
     }

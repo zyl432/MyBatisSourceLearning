@@ -48,11 +48,11 @@ import org.apache.ibatis.session.SqlSession;
  */
 public class DefaultSqlSession implements SqlSession {
 
-  private final Configuration configuration;
-  private final Executor executor;
+  private final Configuration configuration;//configuration对象，全局唯一
+  private final Executor executor;//底层依赖的excutor对象
 
-  private final boolean autoCommit;
-  private boolean dirty;
+  private final boolean autoCommit;//是否自动提交事务
+  private boolean dirty;//当前缓存是否有脏数据
   private List<Cursor<?>> cursorList;
 
   public DefaultSqlSession(Configuration configuration, Executor executor, boolean autoCommit) {
@@ -144,7 +144,9 @@ public class DefaultSqlSession implements SqlSession {
   @Override
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
     try {
+      //从configuration中获取要执行的sql语句的配置信息
       MappedStatement ms = configuration.getMappedStatement(statement);
+      //通过executor执行语句，并返回指定的结果集
       return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);

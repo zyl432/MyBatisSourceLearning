@@ -80,6 +80,7 @@ public class BatchExecutor extends BaseExecutor {
   }
 
   @Override
+  //batchExecutor查询实现
   public <E> List<E> doQuery(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)
       throws SQLException {
     Statement stmt = null;

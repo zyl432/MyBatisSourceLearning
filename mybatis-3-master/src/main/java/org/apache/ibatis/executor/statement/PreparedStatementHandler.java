@@ -72,23 +72,30 @@ public class PreparedStatementHandler extends BaseStatementHandler {
   }
 
   @Override
+  //使用底层的prepareStatement对象来完成对数据库的操作
   protected Statement instantiateStatement(Connection connection) throws SQLException {
     String sql = boundSql.getSql();
-    if (mappedStatement.getKeyGenerator() instanceof Jdbc3KeyGenerator) {
+    //根据mappedStatement.getKeyGenerator字段，创建prepareStatement
+    if (mappedStatement.getKeyGenerator() instanceof Jdbc3KeyGenerator) {//对于insert语句
       String[] keyColumnNames = mappedStatement.getKeyColumns();
       if (keyColumnNames == null) {
+    	//返回数据库生成的主键
         return connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
       } else {
+    	//返回数据库生成的主键填充至keyColumnNames中指定的列
         return connection.prepareStatement(sql, keyColumnNames);
       }
     } else if (mappedStatement.getResultSetType() != null) {
+     //设置结果集是否可以滚动以及其游标是否可以上下移动，设置结果集是否可更新
       return connection.prepareStatement(sql, mappedStatement.getResultSetType().getValue(), ResultSet.CONCUR_READ_ONLY);
     } else {
+      //创建普通的prepareStatement对象
       return connection.prepareStatement(sql);
     }
   }
 
   @Override
+  //使用parameterHandler对sql语句的占位符进行处理
   public void parameterize(Statement statement) throws SQLException {
     parameterHandler.setParameters((PreparedStatement) statement);
   }
